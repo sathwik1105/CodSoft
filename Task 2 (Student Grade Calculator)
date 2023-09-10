@@ -1,0 +1,36 @@
+import java.io.*;
+import java.util.*;
+class Main
+{
+    public static void main(String[] args)
+    {
+        Scanner sc=new Scanner(System.in);
+        System.out.println("Enter the marks out of 100 in each subject as follows:");
+        System.out.print("Enter the marks in Mathematics:");
+        int maths=sc.nextInt();
+        System.out.print("Enter the marks in Science:");
+        int science=sc.nextInt();
+        System.out.print("Enter the marks in Social Studies:");
+        int social=sc.nextInt();
+        System.out.print("Enter the marks in English:");
+        int english=sc.nextInt();
+        int total_marks=maths+science+social+english;
+        int average_percentage=total_marks/4;
+        System.out.println("Total Marks = "+total_marks);
+        System.out.println("Average Marks = "+average_percentage);
+        if(average_percentage>=95)
+            System.out.println("Grade = O");
+        else if(average_percentage>=90 && average_percentage<=95)
+            System.out.println("Grade = A+");
+        else if(average_percentage>=85 && average_percentage<=90)
+            System.out.println("Grade = A");
+        else if(average_percentage>=80 && average_percentage<=85)
+            System.out.println("Grade = B+");
+        else if(average_percentage>=70 && average_percentage<=80)
+            System.out.println("Grade = B");
+        else if(average_percentage>=60 && average_percentage<=70)
+            System.out.println("Grade = C");
+        else
+            System.out.println("Grade = D");
+    }
+}
