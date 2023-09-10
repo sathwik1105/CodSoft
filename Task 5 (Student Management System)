@@ -1,0 +1,185 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.*;
+import java.util.ArrayList;
+class Student
+{
+    private String name;
+    private int rollNumber;
+    private String grade;
+    public Student(String name, int rollNumber, String grade)
+    {
+        this.name = name;
+        this.rollNumber = rollNumber;
+        this.grade = grade;
+    }
+    public String getName()
+    {
+        return name;
+    }
+    public void setName(String name)
+    {
+        this.name = name;
+    }
+    public int getRollNumber()
+    {
+        return rollNumber;
+    }
+    public void setRollNumber(int rollNumber)
+    {
+        this.rollNumber = rollNumber;
+    }
+    public String getGrade()
+    {
+        return grade;
+    }
+    public void setGrade(String grade)
+    {
+        this.grade = grade;
+    }
+    @Override
+    public String toString()
+    {
+        return "Roll Number: " + rollNumber + " | Name: " + name + " | Grade: " + grade;
+    }
+}
+
+class StudentManagementSystem
+{
+    private ArrayList<Student> students = new ArrayList<>();
+    private final String dataFileName = "students.txt";
+    public StudentManagementSystem()
+    {
+        loadStudentData();
+    }
+    public void addStudent(Student student)
+    {
+        students.add(student);
+        saveStudentData();
+    }
+    public void removeStudent(int rollNumber)
+    {
+        students.removeIf(student -> student.getRollNumber() == rollNumber);
+        saveStudentData();
+    }
+    public Student searchStudent(int rollNumber)
+    {
+        for (Student student : students)
+        {
+            if (student.getRollNumber() == rollNumber)
+            {
+                return student;
+            }
+        }
+        return null;
+    }
+    public ArrayList<Student> getAllStudents()
+    {
+        return students;
+    }
+    private void loadStudentData()
+    {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(dataFileName)))
+        {
+            students = (ArrayList<Student>) ois.readObject();
+        }
+        catch (IOException | ClassNotFoundException e)
+        {
+        }
+    }
+
+    private void saveStudentData()
+    {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(dataFileName))) {
+            oos.writeObject(students);
+        }
+        catch (IOException e)
+        {
+        }
+    }
+}
+
+class StudentManagementGUI
+{
+    private StudentManagementSystem system = new StudentManagementSystem();
+    private JFrame frame;
+    private JTextField rollNumberField;
+    private JTextArea outputArea;
+    public StudentManagementGUI()
+    {
+        frame = new JFrame("Student Management System");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(400, 300);
+
+        JPanel panel = new JPanel();
+        panel.setLayout(new GridLayout(4, 2));
+
+        JLabel rollNumberLabel = new JLabel("Roll Number:");
+        rollNumberField = new JTextField();
+        JLabel nameLabel = new JLabel("Name:");
+        JTextField nameField = new JTextField();
+        JLabel gradeLabel = new JLabel("Grade:");
+        JTextField gradeField = new JTextField();
+
+        JButton addButton = new JButton("Add Student");
+        addButton.addActionListener(e -> {
+            int rollNumber = Integer.parseInt(rollNumberField.getText());
+            String name = nameField.getText();
+            String grade = gradeField.getText();
+            Student student = new Student(name, rollNumber, grade);
+            system.addStudent(student);
+            rollNumberField.setText("");
+            nameField.setText("");
+            gradeField.setText("");
+            displayAllStudents();
+        });
+
+        JButton searchButton = new JButton("Search Student");
+        searchButton.addActionListener(e -> {
+            int rollNumber = Integer.parseInt(rollNumberField.getText());
+            Student student = system.searchStudent(rollNumber);
+            if (student != null) {
+                outputArea.setText(student.toString());
+            } else {
+                outputArea.setText("Student not found.");
+            }
+        });
+
+        JButton displayAllButton = new JButton("Display All Students");
+        displayAllButton.addActionListener(e -> displayAllStudents());
+
+        panel.add(rollNumberLabel);
+        panel.add(rollNumberField);
+        panel.add(nameLabel);
+        panel.add(nameField);
+        panel.add(gradeLabel);
+        panel.add(gradeField);
+        panel.add(addButton);
+        panel.add(searchButton);
+
+        outputArea = new JTextArea();
+        JScrollPane scrollPane = new JScrollPane(outputArea);
+
+        frame.add(panel, BorderLayout.NORTH);
+        frame.add(scrollPane, BorderLayout.CENTER);
+        frame.add(displayAllButton, BorderLayout.SOUTH);
+
+        frame.setVisible(true);
+    }
+
+    private void displayAllStudents()
+    {
+        ArrayList<Student> students = system.getAllStudents();
+        StringBuilder sb = new StringBuilder();
+        for (Student student : students) {
+            sb.append(student.toString()).append("\n");
+        }
+        outputArea.setText(sb.toString());
+    }
+
+    public static void main(String[] args)
+    {
+        SwingUtilities.invokeLater(() -> new StudentManagementGUI());
+    }
+}
